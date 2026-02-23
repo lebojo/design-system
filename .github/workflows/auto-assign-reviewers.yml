@@ -3,26 +3,24 @@
 name: Auto Assign Reviewers
 
 on:
-  issues:
-    types: [opened, edited, labeled, unlabeled]
   pull_request:
-    types: [opened, edited, labeled, unlabeled]
+    types: [opened, ready_for_review]
 
 concurrency:
   group: auto-assign-reviewers-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  auto-assign:
+  assign-reviewers:
+    if: github.event.action != 'opened' || github.event.pull_request.draft == false
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
-      issues: write
     steps:
       - uses: wow-actions/auto-assign@v3
         with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           reviewers: |
             lifaon74
             vjo
+            lebojo
           skipDraft: true
