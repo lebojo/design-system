@@ -200,7 +200,7 @@ export function buildCssTokens({
         //   'breakpoint',
         //   'container',
         //   'spacing', // ✅
-        //   'radius',
+        //   'radius', // ✅
         //   'shadow',
         //   'inset-shadow',
         //   'drop-shadow',
@@ -284,6 +284,14 @@ export function buildCssTokens({
                         'weight',
                         ...token.name.slice(2),
                       ]),
+                    ),
+                  ];
+                } else if (tokenName.startsWith('radius')) {
+                  // --radius-*
+                  return [
+                    generateTailwindToken(
+                      token,
+                      RAW_GENERATE_CSS_VARIABLE_NAME_FUNCTION(['radius', ...token.name.slice(1)]),
                     ),
                   ];
                 }
