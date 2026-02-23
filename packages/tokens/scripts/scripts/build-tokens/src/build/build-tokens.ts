@@ -63,9 +63,10 @@ export function buildTokens({
     //   logger,
     // });
 
-    // Markdown
+    // MARKDOWN
     await buildMarkdownTokens({
-      collection: baseCollection,
+      baseCollection,
+      modifiers,
       outputDirectory,
       logger,
     });
