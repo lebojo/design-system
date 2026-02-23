@@ -1,0 +1,25 @@
+# https://github.com/marketplace/actions/auto-assign-issues-prs
+
+name: Auto Assign Reviewers
+
+on:
+  pull_request:
+    types: [opened, reopened, ready_for_review]
+
+concurrency:
+  group: auto-assign-reviewers-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  assign-reviewers:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - uses: wow-actions/auto-assign@v3
+        with:
+          reviewers: |
+            lifaon74
+            vjo
+            lebojo
+          skipDraft: true

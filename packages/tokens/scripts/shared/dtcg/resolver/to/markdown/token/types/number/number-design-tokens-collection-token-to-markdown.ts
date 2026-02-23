@@ -1,4 +1,6 @@
+import { isCurlyReference } from '../../../../../../design-token/reference/types/curly/is-curly-reference.ts';
 import type { NumberDesignTokensCollectionToken } from '../../../../../token/types/base/number/number-design-tokens-collection-token.ts';
+import { curlyReferenceToCssVariableReference } from '../../../../css/reference/curly-reference-to-css-variable-reference.ts';
 import type { MarkdownRenderContext } from '../../markdown-render-context.ts';
 import type { MarkdownTokenRow } from '../../markdown-token-row.ts';
 
@@ -163,7 +165,9 @@ export function numberDesignTokensCollectionTokenToMarkdown(
   // Format the value
   let displayValue: string;
 
-  if (Number.isInteger(value)) {
+  if (isCurlyReference(value)) {
+    displayValue = curlyReferenceToCssVariableReference(value);
+  } else if (Number.isInteger(value)) {
     // Integer value - show as-is
     displayValue = value.toString();
   } else {
@@ -189,7 +193,7 @@ export function numberDesignTokensCollectionTokenToMarkdown(
   // For others, show a styled code block
   let preview: string;
 
-  if (isRatioToken(token.name)) {
+  if (isRatioToken(token.name) && !isCurlyReference(value)) {
     preview = createRatioPreview(value, displayValue, token.name);
   } else {
     preview = /* HTML */ `
