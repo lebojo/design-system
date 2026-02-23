@@ -1,7 +1,12 @@
 import { dirname, join } from 'node:path';
+import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 import { loadOptionallyEnvFile } from '../../../../../scripts/helpers/env/load-env-file.ts';
+import {
+  parseJsonStringRecord,
+  parseNumber,
+} from '../../../../../scripts/helpers/env/parse-value.ts';
 import { DEFAULT_LOG_LEVEL } from '../../../../../scripts/helpers/log/log-level/defaults/default-log-level.ts';
 import { Logger } from '../../../../../scripts/helpers/log/logger.ts';
 import { publishTokens } from './src/publish-tokens.ts';
@@ -38,6 +43,12 @@ export async function publishTokensScript(): Promise<void> {
     outputDirectory: OUTPUT_DIR,
     mode,
     tag,
+    publishTimestamp: parseNumber(process.env['CI_PUBLISH_TIMESTAMP']),
+    versionOverride: process.env['NPM_PUBLISH_VERSION'],
+    internalDependencyVersionOverrides: parseJsonStringRecord(
+      process.env['NPM_INTERNAL_DEP_OVERRIDES_JSON'],
+      'NPM_INTERNAL_DEP_OVERRIDES_JSON',
+    ),
     logger,
   });
 }

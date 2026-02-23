@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { buildNpmPublishArgs } from './publish-tokens.ts';
+import {
+  buildNpmPublishArgs,
+  resolvePublishVersion,
+  rewriteInternalDependencyVersions,
+} from './publish-tokens.ts';
 
 describe('buildNpmPublishArgs', () => {
   it('uses dev tag in dev mode', () => {
@@ -31,5 +35,89 @@ describe('buildNpmPublishArgs', () => {
       '--tag',
       'rc',
     ]);
+  });
+});
+
+describe('resolvePublishVersion', () => {
+  it('uses explicit ci override when provided', () => {
+    expect(
+      resolvePublishVersion({
+        mode: 'prod',
+        packageVersion: '1.2.3',
+        publishTimestamp: 1234,
+        versionOverride: '1.2.3-rc.1234',
+      }),
+    ).toBe('1.2.3-rc.1234');
+  });
+
+  it('generates dev prerelease in dev mode without override', () => {
+    expect(
+      resolvePublishVersion({
+        mode: 'dev',
+        packageVersion: '1.2.3',
+        publishTimestamp: 1234,
+      }),
+    ).toBe('1.2.3-dev.1234');
+  });
+
+  it('returns package version in prod mode without override', () => {
+    expect(
+      resolvePublishVersion({
+        mode: 'prod',
+        packageVersion: '1.2.3',
+        publishTimestamp: 1234,
+      }),
+    ).toBe('1.2.3');
+  });
+});
+
+describe('rewriteInternalDependencyVersions', () => {
+  it('rewrites internal versions in dependency fields', () => {
+    expect(
+      rewriteInternalDependencyVersions({
+        packageJsonContent: {
+          name: '@scope/b',
+          version: '1.2.3',
+          dependencies: {
+            '@scope/a': '1.2.3',
+            react: '^19.0.0',
+          },
+          peerDependencies: {
+            '@scope/c': '2.0.0',
+          },
+        },
+        overrides: {
+          '@scope/a': '1.2.3-rc.1234',
+          '@scope/c': '2.0.0-rc.1234',
+        },
+      }),
+    ).toEqual({
+      name: '@scope/b',
+      version: '1.2.3',
+      dependencies: {
+        '@scope/a': '1.2.3-rc.1234',
+        react: '^19.0.0',
+      },
+      peerDependencies: {
+        '@scope/c': '2.0.0-rc.1234',
+      },
+    });
+  });
+
+  it('returns input as-is when no overrides are provided', () => {
+    const packageJsonContent = {
+      name: '@scope/b',
+      version: '1.2.3',
+      dependencies: {
+        '@scope/a': '1.2.3',
+      },
+    };
+
+    expect(
+      rewriteInternalDependencyVersions({
+        packageJsonContent,
+        overrides: {},
+      }),
+    ).toBe(packageJsonContent);
   });
 });
