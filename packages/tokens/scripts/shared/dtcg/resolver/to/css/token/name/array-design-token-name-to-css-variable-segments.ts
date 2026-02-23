@@ -12,7 +12,6 @@ export function arrayDesignTokenNameToCssVariableSegments(
   const _removeSegments = new Set(removeSegments);
   return name
     .map(designTokenNameSegmentToCssVariableSegment)
-    .map(designTokenNameSegmentToCssVariableSegment)
     .filter((segment: string): boolean => {
       return (
         !(_removeSegments.has('empty') && segment === '') &&
