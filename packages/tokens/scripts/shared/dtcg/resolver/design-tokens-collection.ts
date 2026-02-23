@@ -13,12 +13,13 @@ import { designTokensTreeSchema } from '../design-token/tree/design-tokens-tree.
 import type { DesignTokensTree } from '../design-token/tree/design-tokens-tree.ts';
 import { ascendDesignTokensTreeCommonTypes } from '../operations/ascend-common-types/ascend-design-tokens-tree-common-types.ts';
 import { mergeDesignTokensTrees } from '../operations/merge/merge-design-tokens-trees.ts';
-import type {
-  DesignTokensCollectionTokenExtensions,
-  DesignTokensCollectionTokenWithType,
-  GenericDesignTokensCollectionToken,
-  GenericDesignTokensCollectionTokenWithType,
-  GenericResolvedDesignTokensCollectionToken,
+import {
+  type DesignTokensCollectionTokenExtensions,
+  type DesignTokensCollectionTokenWithType,
+  type GenericDesignTokensCollectionToken,
+  type GenericDesignTokensCollectionTokenWithType,
+  type GenericResolvedDesignTokensCollectionToken,
+  isDesignTokensCollectionTokenWithType,
 } from './token/design-tokens-collection-token.ts';
 import { designTokenValueToDesignTokensCollectionTokenValue } from './token/from/design-token-value-to-design-tokens-collection-token-value.ts';
 import type { ArrayDesignTokenName } from './token/name/array-design-token-name.ts';
@@ -278,7 +279,9 @@ export class DesignTokensCollection {
       if (isCurlyReference(token.value)) {
         return token.value === nameAsCurlyReference;
       } else {
-        console.assert(token.type !== undefined);
+        if (!isDesignTokensCollectionTokenWithType(token)) {
+          throw new Error('Expected token with type.');
+        }
 
         if (isBorderDesignTokensCollectionToken(token)) {
           return isBorderDesignTokensCollectionTokenValueReferencing(
@@ -554,7 +557,9 @@ export class DesignTokensCollection {
           value = toAsCurlyReference;
         }
       } else {
-        console.assert(token.type !== undefined);
+        if (!isDesignTokensCollectionTokenWithType(token)) {
+          throw new Error('Expected token with type.');
+        }
 
         if (isBorderDesignTokensCollectionToken(token)) {
           value = updateBorderDesignTokensCollectionTokenValueReferences(token.value, update);
