@@ -23,3 +23,5 @@ jobs:
             vjo
             lebojo
           skipDraft: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
