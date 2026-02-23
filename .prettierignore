@@ -1,0 +1,14 @@
+# Ignore artifacts:
+**/build
+**/dist
+**/coverage
+**/storybook-static
+
+**/.idea
+**/.yarn
+
+# Default
+**/.git
+**/.svn
+**/.hg
+**/node_modules
