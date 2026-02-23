@@ -11,7 +11,7 @@ on:
 #  cancel-in-progress: true
 
 jobs:
-  assign-reviewers:
+  auto-assign-author-and-reviewers:
     runs-on: ubuntu-latest
     steps:
       - uses: kentaro-m/auto-assign-action@v2.0.1
