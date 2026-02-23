@@ -190,6 +190,7 @@ export function buildCssTokens({
       };
 
       const cssVariables: string = cssVariableDeclarationsToString([
+        // NOTE: when all namespaces will be bound, we'll remove this comment
         // ...[
         //   'color', // ✅
         //   'font', // ✅
