@@ -43,7 +43,7 @@ export interface ColorMarkdownRenderOptions {
 export function colorDesignTokensCollectionTokenToMarkdown(
   token: ColorDesignTokensCollectionToken,
   _context: MarkdownRenderContext,
-  options: ColorMarkdownRenderOptions = {},
+  _options: ColorMarkdownRenderOptions = {},
 ): MarkdownTokenRow {
   // Get the color value as a CSS string (always returns the best representation)
   // For markdown, we use the default format which typically returns hex for srgb colors
@@ -53,19 +53,25 @@ export function colorDesignTokensCollectionTokenToMarkdown(
   // Create the color preview HTML
   // Shows a rounded rectangle with the color as background
   const preview = /* HTML */ `
-    <div style="
+    <div
+      style="
       border-radius: 4px;
       width: 100%;
       height: 75px;
       background: ${cssValue};
       border: 1px solid #e5e7eb;
-    "></div>
-    <div style="
+    "
+    ></div>
+    <div
+      style="
       margin-top: 4px;
       font-family: monospace;
       font-size: 12px;
       color: #6b7280;
-    ">${cssValue}</div>
+    "
+    >
+      ${cssValue}
+    </div>
   `;
 
   return {
