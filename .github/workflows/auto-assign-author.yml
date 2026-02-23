@@ -1,0 +1,17 @@
+name: Auto Assign Author
+
+on:
+  pull_request_target:
+    types: [opened, reopened]
+
+concurrency:
+  group: auto-assign-author-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  assign-author:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - uses: toshimaru/auto-author-assign@v2.1.1
