@@ -70,7 +70,7 @@ function getRatioFormat(name: readonly string[]): string {
  * @param name - The token name array to extract ratio format
  * @returns HTML string for the ratio preview
  */
-function createRatioPreview(ratio: number, value: string, name: readonly string[]): string {
+function createRatioPreview(ratio: number, _value: string, name: readonly string[]): string {
   // Base height for the preview box
   const baseHeight = 60;
   // Calculate width based on ratio: width = height * ratio

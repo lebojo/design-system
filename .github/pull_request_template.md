@@ -1,9 +1,3 @@
----
-assignees: author
-reviewers: lifaon74, vjo
-draft: true
----
-
 ## PR Checklist
 
 Please check if your PR fulfills the following requirements:
