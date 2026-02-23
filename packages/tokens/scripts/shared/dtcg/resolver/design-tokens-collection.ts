@@ -516,7 +516,7 @@ export class DesignTokensCollection {
       return;
     }
 
-    // TODO improve: get "from" token and rename it directly after/before updating rge references
+    // TODO: improvement - get "from" token and rename it directly after/before updating rge references
 
     if (this.has(to)) {
       if (onExitingTokenBehaviour === 'throw') {
@@ -546,6 +546,8 @@ export class DesignTokensCollection {
       const update: UpdateCurlyReference = (reference: CurlyReference): CurlyReference => {
         return reference === fromAsCurlyReference ? toAsCurlyReference : reference;
       };
+
+      // TODO improvement - use "updateDesignTokensCollectionTokenReferences"
 
       if (isCurlyReference(token.value)) {
         if (token.value === fromAsCurlyReference) {
