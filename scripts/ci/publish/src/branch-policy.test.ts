@@ -2,41 +2,53 @@ import { describe, expect, it } from 'vitest';
 import { getPublishContext } from './branch-policy.ts';
 
 describe('getPublishContext', () => {
-  it('maps develop to rc', () => {
-    expect(getPublishContext({ branchName: 'develop', version: '1.2.3-rc.4', strict: true })).toEqual(
-      { tag: 'rc' },
-    );
+  it('maps push on develop to rc publish context', () => {
+    expect(getPublishContext({ eventName: 'push', branchName: 'develop' })).toEqual({
+      mode: 'rc',
+      shouldPublish: true,
+      tag: 'rc',
+    });
   });
 
-  it('maps main to latest', () => {
-    expect(getPublishContext({ branchName: 'main', version: '1.2.3', strict: true })).toEqual({
+  it('maps push on main to stable publish context', () => {
+    expect(getPublishContext({ eventName: 'push', branchName: 'main' })).toEqual({
+      mode: 'stable',
+      shouldPublish: true,
       tag: 'latest',
     });
   });
 
-  it('throws on stable version in develop when strict', () => {
-    expect(() =>
+  it('maps pull request with dev label to dev publish context', () => {
+    expect(
       getPublishContext({
+        eventName: 'pull_request',
         branchName: 'develop',
-        version: '1.2.3',
-        strict: true,
+        pullRequestLabels: ['bug', 'dev'],
       }),
-    ).toThrow('must be an rc version');
-  });
-
-  it('throws on rc version in main when strict', () => {
-    expect(() =>
-      getPublishContext({
-        branchName: 'main',
-        version: '1.2.3-rc.4',
-        strict: true,
-      }),
-    ).toThrow('must be a stable version');
-  });
-
-  it('accepts stable on develop when strict mode is disabled', () => {
-    expect(getPublishContext({ branchName: 'develop', version: '1.2.3', strict: false })).toEqual({
-      tag: 'rc',
+    ).toEqual({
+      mode: 'dev',
+      shouldPublish: true,
+      tag: 'dev',
     });
+  });
+
+  it('disables publish on pull request without dev label', () => {
+    expect(
+      getPublishContext({
+        eventName: 'pull_request',
+        branchName: 'main',
+        pullRequestLabels: ['ready-for-review'],
+      }),
+    ).toEqual({
+      mode: 'dev',
+      shouldPublish: false,
+      tag: 'dev',
+    });
+  });
+
+  it('throws on unsupported branch for push', () => {
+    expect(() => getPublishContext({ eventName: 'push', branchName: 'feature/x' })).toThrow(
+      'Unsupported branch',
+    );
   });
 });
