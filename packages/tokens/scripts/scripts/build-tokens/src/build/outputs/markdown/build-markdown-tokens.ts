@@ -76,6 +76,7 @@ interface TokenGroup {
  */
 function groupTokensByTierAndCategory(
   tokens: IteratorObject<GenericDesignTokensCollectionToken>,
+  logger: Logger,
 ): Map<string, TokenGroup> {
   const groups = new Map<string, TokenGroup>();
 
@@ -88,7 +89,7 @@ function groupTokensByTierAndCategory(
     const tierPrefix = token.files.length > 0 ? getTierPrefix(token.files[0]!) : undefined;
 
     if (tierPrefix === undefined) {
-      console.warn(`Unable to determine tier for token: ${token.name.join('.')}`);
+      logger.warn(`Unable to determine tier for token: ${token.name.join('.')}`);
       continue;
     }
 
@@ -198,6 +199,7 @@ function generateCategoryMarkdown(
   category: string,
   tokens: GenericDesignTokensCollectionToken[],
   context: MarkdownRenderContext,
+  logger: Logger,
 ): string {
   const [headerRow, separatorRow] = generateColumnHeaders(category);
   const showType = category === 'font';
@@ -214,7 +216,7 @@ function generateCategoryMarkdown(
       }
     } catch (error) {
       // Log error but continue with other tokens
-      console.warn(`Failed to render token ${token.name.join('.')}:`, error);
+      logger.warn(`Failed to render token ${token.name.join('.')}:`, error);
     }
   }
 
@@ -234,6 +236,7 @@ function generateCategoryMarkdown(
  */
 export async function buildMarkdownTokens({
   baseCollection,
+  // @ts-expect-error: not in use yet
   modifiers,
   outputDirectory,
   logger,
@@ -242,12 +245,17 @@ export async function buildMarkdownTokens({
     const context: MarkdownRenderContext = { collection: baseCollection };
 
     // Group tokens by tier and category
-    const tokensByTierAndCategory = groupTokensByTierAndCategory(baseCollection.tokens());
+    const tokensByTierAndCategory = groupTokensByTierAndCategory(baseCollection.tokens(), logger);
 
     // Generate markdown for each tier-category combination
     for (const [key, group] of tokensByTierAndCategory.entries()) {
       await logger.asyncTask(`category: ${key}`, async (): Promise<void> => {
-        const markdownContent = generateCategoryMarkdown(group.category, group.tokens, context);
+        const markdownContent = generateCategoryMarkdown(
+          group.category,
+          group.tokens,
+          context,
+          logger,
+        );
         const markdown = `<!-- ${AUTO_GENERATED_FILE_HEADER} -->\n\n` + markdownContent;
         const filePath = join(outputDirectory, 'markdown', `${key}.md`);
         await writeFileSafe(filePath, markdown, { encoding: 'utf-8' });
