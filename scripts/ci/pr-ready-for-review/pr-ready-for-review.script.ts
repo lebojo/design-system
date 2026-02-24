@@ -17,6 +17,8 @@ function prReadyForReviewScript(): Promise<void> {
     loadOptionallyEnvFile(logger);
 
     await execCommandInherit(logger, 'yarn', ['check']);
+    // TODO add support for coverage with PR feedback
+    await execCommandInherit(logger, 'yarn', ['test']);
 
     const details: GithubPullRequestDetails = getEnvGithubPullRequestDetails();
 
