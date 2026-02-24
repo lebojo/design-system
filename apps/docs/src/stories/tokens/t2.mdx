@@ -1,0 +1,45 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Design Tokens/T2" />
+
+# T2 Semantic Tokens
+
+## What are T2 Tokens?
+
+T2 tokens are contextual design tokens that reference T1 (primitive) values. They define common patterns that many components will share.
+
+### Characteristics:
+
+- **Purpose-driven naming**: Named by what they do, not what they are
+- **Resolve to T1 values**: Point to primitive tokens for actual values
+- **Modifiers**: Modifiers could override T2 tokens to adapt to a specific use cases
+- **Cross-component usage**: Used by multiple components
+- **Design patterns**: Semantic layer ensures consistent usage
+
+### Examples:
+
+- `color.background.primary` instead of `color-blue-500`
+- `spacing.section.large` instead of `spacing.32`
+
+### Token Categories in T2:
+
+| Category                                        | Description            |
+| ----------------------------------------------- | ---------------------- |
+| [Border](/docs/design-tokens-t2-border--docs)   | Semantic border styles |
+| [Color](/docs/design-tokens-t2-color--docs)     | Semantic color aliases |
+| [Font](/docs/design-tokens-t2-font--docs)       | Semantic typography    |
+| [Icon](/docs/design-tokens-t2-icon--docs)       | Icon-related tokens    |
+| [Radius](/docs/design-tokens-t2-radius--docs)   | Semantic border radius |
+| [Spacing](/docs/design-tokens-t2-spacing--docs) | Semantic spacing       |
+| [Text](/docs/design-tokens-t2-text--docs)       | Text styling tokens    |
+
+<style>
+  {`
+    table {
+      width: 100%;
+      margin-top: 1rem;
+    }
+    td { padding: 8px; }
+    th { text-align: left; padding: 8px; }
+  `}
+</style>

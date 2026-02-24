@@ -1,0 +1,39 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Design Tokens/T3" />
+
+# T3 Component Tokens
+
+## What are T3 Tokens?
+
+T3 tokens are component-specific design tokens that reference T1 (primitive) and T2 (semantic) values. They define visual properties for specific components.
+
+### Characteristics:
+
+- **Component-specific**: Named after a specific component
+- **Reference T1 and T2**: Points to lower tier tokens
+- **Modifiers**: Modifiers could override T3 tokens to adapt to a specific use cases
+- **Single component usage**: Used by one specific component
+- **Different variants**: Supports component states (hover, active, disabled)
+
+### Examples:
+
+- `button.background.hover` using `color.background.primary-hover`
+- `card.padding` using `spacing.section.medium`
+
+### Token Categories in T3:
+
+| Category                                              | Description                 |
+| ----------------------------------------------------- | --------------------------- |
+| [Typography](/docs/design-tokens-t3-typography--docs) | Typography component styles |
+
+<style>
+  {`
+    table {
+      width: 100%;
+      margin-top: 1rem;
+    }
+    td { padding: 8px; }
+    th { text-align: left; padding: 8px; }
+  `}
+</style>
