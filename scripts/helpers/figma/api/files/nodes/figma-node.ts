@@ -1,13 +1,14 @@
-import { type FigmaVariableAlias } from '../types/figma-variable-alias.ts';
+import type { ExplicitAny } from '../../../../types/explicit-any.ts';
+import type { FigmaVariableAlias } from '../types/figma-variable-alias.ts';
 
-export interface FigmaNode<GType extends string = any> {
+export interface FigmaNode<GType extends string = ExplicitAny> {
   readonly id: string;
   readonly name: string;
   readonly visible?: boolean; // (default: true)
   readonly type: GType;
   readonly rotation?: number; // (default: 0)
-  readonly pluginData?: any;
-  readonly sharedPluginData?: any;
+  readonly pluginData?: ExplicitAny;
+  readonly sharedPluginData?: ExplicitAny;
   readonly componentPropertyReferences?: Readonly<Record<string, string>>;
   readonly boundVariables?: Readonly<
     Record<

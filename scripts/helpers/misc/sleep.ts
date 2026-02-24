@@ -1,3 +1,5 @@
+import type { ExplicitAny } from '../types/explicit-any.ts';
+
 /**
  * Creates a Promise that resolves after `duration` milliseconds.
  */
@@ -17,7 +19,7 @@ export function sleep(duration: number, signal?: AbortSignal): Promise<void> {
 
     signal?.addEventListener('abort', onAbort);
 
-    const timer: any = setTimeout((): void => {
+    const timer: ExplicitAny = setTimeout((): void => {
       end();
       resolve();
     }, duration);

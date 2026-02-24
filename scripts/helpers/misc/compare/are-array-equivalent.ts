@@ -1,7 +1,8 @@
+import type { ExplicitAny } from '../../types/explicit-any.ts';
 import { areEquivalent } from './are-equivalent.ts';
-import { EqualFunction } from './equal-function.ts';
+import type { EqualFunction } from './equal-function.ts';
 
-export function areArrayEquivalent<GValue = any>(
+export function areArrayEquivalent<GValue = ExplicitAny>(
   a: ArrayLike<GValue>,
   b: ArrayLike<GValue>,
   equal: EqualFunction<GValue> = areEquivalent,

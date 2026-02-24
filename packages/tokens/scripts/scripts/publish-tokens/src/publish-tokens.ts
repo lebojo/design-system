@@ -3,6 +3,7 @@ import { readJsonFile } from '../../../../../../scripts/helpers/file/read-json-f
 import { writeJsonFileSafe } from '../../../../../../scripts/helpers/file/write-json-file-safe.ts';
 import { Logger } from '../../../../../../scripts/helpers/log/logger.ts';
 import { execCommandInherit } from '../../../../../../scripts/helpers/misc/exec-command.ts';
+import type { ExplicitAny } from '../../../../../../scripts/helpers/types/explicit-any.ts';
 
 export interface PublishTokensOptions {
   readonly outputDirectory: string;
@@ -27,7 +28,12 @@ export interface BuildNpmPublishArgsOptions {
 }
 
 export function buildNpmPublishArgs({ mode, tag }: BuildNpmPublishArgsOptions): string[] {
-  const args: string[] = ['--//registry.npmjs.org/:_authToken=$NPM_TOKEN', 'publish', '--access', 'public'];
+  const args: string[] = [
+    '--//registry.npmjs.org/:_authToken=$NPM_TOKEN',
+    'publish',
+    '--access',
+    'public',
+  ];
 
   if (mode === 'dev') {
     args.push('--tag', 'dev');
@@ -57,7 +63,8 @@ export function publishTokens({
             const webPackageDirectory: string = join(outputDirectory, 'web');
             const webPackageFile: string = join(webPackageDirectory, 'package.json');
 
-            const packageJsonContent: any = await readJsonFile(webPackageFile);
+            // TODO type JSON package
+            const packageJsonContent: ExplicitAny = await readJsonFile(webPackageFile);
 
             const args: string[] = buildNpmPublishArgs({ mode, tag });
 
@@ -74,7 +81,6 @@ export function publishTokens({
                 ...packageJsonContent,
                 version,
               });
-
             } else {
               version = packageJsonContent.version;
             }

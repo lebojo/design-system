@@ -1,3 +1,4 @@
+import type { ExplicitAny } from '../../../../../../../scripts/helpers/types/explicit-any.ts';
 import type { ValueOrDesignTokenReference } from '../reference/value-or/value-or-design-token-reference.ts';
 
 /**
@@ -14,5 +15,5 @@ export interface DesignToken<GType extends string, GValue> {
   readonly $type?: GType;
   readonly $deprecated?: boolean | string;
   readonly $description?: string;
-  readonly $extensions?: Record<string, any>;
+  readonly $extensions?: Record<string, ExplicitAny>;
 }

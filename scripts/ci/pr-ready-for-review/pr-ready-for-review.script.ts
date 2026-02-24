@@ -20,7 +20,7 @@ function prReadyForReviewScript(): Promise<void> {
 
     const details: GithubPullRequestDetails = getEnvGithubPullRequestDetails();
 
-    await logger.asyncTask('send-kchat-notification', async (_logger: Logger): Promise<void> => {
+    await logger.asyncTask('send-kchat-notification', async (): Promise<void> => {
       await postKchatWebhookMessage({
         webhookId: getEnvKchatWebhookId(),
         text: dedent`

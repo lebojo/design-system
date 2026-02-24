@@ -1,7 +1,8 @@
+import type { ExplicitAny } from '../../types/explicit-any.ts';
 import { areEquivalent } from './are-equivalent.ts';
 import type { EqualFunction } from './equal-function.ts';
 
-export function areSetEquivalent<GValue = any>(
+export function areSetEquivalent<GValue = ExplicitAny>(
   a: ReadonlySet<GValue>,
   b: ReadonlySet<GValue>,
   equal: EqualFunction<GValue> = areEquivalent,
