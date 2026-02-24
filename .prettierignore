@@ -3,6 +3,7 @@
 **/coverage
 **/storybook-static
 
+# Environement
 **/.idea
 **/.yarn
 
