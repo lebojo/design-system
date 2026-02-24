@@ -7,7 +7,6 @@ import { postKchatWebhookMessage } from '../../helpers/kchat/api/post-kchat-webh
 import { getEnvKchatWebhookId } from '../../helpers/kchat/env/get-env-kchat-webhook-id.ts';
 import { DEFAULT_LOG_LEVEL } from '../../helpers/log/log-level/defaults/default-log-level.ts';
 import { Logger } from '../../helpers/log/logger.ts';
-import { execCommandInherit } from '../../helpers/misc/exec-command.ts';
 import { dedent } from '../../helpers/misc/string/dedent/dedent.ts';
 
 const logger = Logger.root({ logLevel: DEFAULT_LOG_LEVEL });
@@ -15,10 +14,6 @@ const logger = Logger.root({ logLevel: DEFAULT_LOG_LEVEL });
 function prReadyForReviewScript(): Promise<void> {
   return logger.asyncTask('on-pull-request-ready.script', async (logger: Logger): Promise<void> => {
     loadOptionallyEnvFile(logger);
-
-    await execCommandInherit(logger, 'yarn', ['check']);
-    // TODO add support for coverage with PR feedback
-    await execCommandInherit(logger, 'yarn', ['test']);
 
     const details: GithubPullRequestDetails = getEnvGithubPullRequestDetails();
 
