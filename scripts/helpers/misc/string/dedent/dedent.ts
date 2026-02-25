@@ -80,7 +80,7 @@ function dedentRaw(text: string, indent: string): string[] {
   return text.split('\n').map((line: string, index: number): string => {
     if (line.startsWith(indent)) {
       return line.slice(indent.length);
-    } else if (index == 0) {
+    } else if (index == 0 || line === '') {
       return line;
     } else {
       throw new Error(
