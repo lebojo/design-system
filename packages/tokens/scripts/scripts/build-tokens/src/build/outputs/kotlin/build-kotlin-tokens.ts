@@ -1,6 +1,8 @@
 import type Color from 'colorjs.io';
 import { writeFileSafe } from '../../../../../../../../../scripts/helpers/file/write-file-safe.ts';
 import type { Logger } from '../../../../../../../../../scripts/helpers/log/logger.ts';
+import { indent } from '../../../../../../../../../scripts/helpers/misc/string/indent/indent.ts';
+import { isCurlyReference } from '../../../../../../shared/dtcg/design-token/reference/types/curly/is-curly-reference.ts';
 import { colorDesignTokenValueToColorJs } from '../../../../../../shared/dtcg/design-token/token/types/base/types/color/value/to/colorjs/color-design-token-value-to-color-js.ts';
 import type { DesignTokensCollection } from '../../../../../../shared/dtcg/resolver/design-tokens-collection.ts';
 import type { GenericDesignTokensCollectionTokenWithType } from '../../../../../../shared/dtcg/resolver/token/design-tokens-collection-token.ts';
@@ -27,11 +29,15 @@ export function buildKotlinTokens({
     const kotlinColorsProperties: KotlinColorProperty[] = [];
 
     for (const token of collection.tokens()) {
-      if (isColorDesignTokensCollectionToken(token)) {
-        const resolvedToken: GenericDesignTokensCollectionTokenWithType = {
-          ...token,
-          type: collection.resolve(token).type,
-        };
+      const resolvedToken: GenericDesignTokensCollectionTokenWithType = {
+        ...token,
+        type: collection.resolve(token).type,
+      };
+
+      if (isColorDesignTokensCollectionToken(resolvedToken)) {
+        if (isCurlyReference(resolvedToken.value)) {
+          continue;
+        }
 
         const kotlinValName = resolvedToken.name.filter((part) => part !== 'color').join('');
         const color: Color = colorDesignTokenValueToColorJs(resolvedToken.value, resolvedToken);
