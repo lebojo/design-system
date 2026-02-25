@@ -57,10 +57,17 @@ export function buildKotlinTokens({
 
 /** Converts hex RRGGBBAA (standard) to AARRGGBB (Jetpack Compose) */
 function colorToCompose(color: Color): string {
-  const hexCode = color.toString({ format: 'hex', collapse: false }).toUpperCase();
-  return (
-    '0x' + (hexCode.length > 7 ? hexCode.slice(-2) + hexCode.slice(1, -2) : 'FF' + hexCode.slice(1))
-  );
+  const hex = color
+    .to('srgb')
+    .toString({ format: 'hex', collapse: false })
+    .substring(1)
+    .toUpperCase();
+
+  // If length is 8, the last 2 chars are `alpha` otherwise, `alpha` is implicit `FF`
+  const alpha = hex.length === 8 ? hex.slice(6) : 'FF';
+  const rgb = hex.slice(0, 6);
+
+  return `0x${alpha}${rgb}`;
 }
 
 function kotlinColorPropertyToString(property: KotlinColorProperty): string {
