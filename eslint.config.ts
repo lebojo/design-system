@@ -30,8 +30,6 @@ export default defineConfig([
       globals: globals.browser,
     },
     rules: {
-      // NOTE: we may want to replace `ExplicitAny` by this rule
-      // '@typescript-eslint/no-explicit-any': 'warn',
       '@typescript-eslint/no-unused-vars': [
         'error',
         {
