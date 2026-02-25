@@ -1,4 +1,3 @@
-import type { ExplicitAny } from '../types/explicit-any.ts';
 import { logLevelSourceToReadonlyMap } from './log-level/log-level-source-to-readonly-map.ts';
 import { type LogLevelSource } from './log-level/log-level-source.ts';
 import { type LogLevel } from './log-level/log-level.ts';
@@ -25,27 +24,27 @@ export class Logger {
     return this.#name;
   }
 
-  report(level: LogLevel, args: ExplicitAny[]): void {
+  report(level: LogLevel, args: unknown[]): void {
     this.#logLevel.get(level)?.(this.#name, args);
   }
 
-  log(...args: ExplicitAny[]): void {
+  log(...args: unknown[]): void {
     this.report('log', args);
   }
 
-  info(...args: ExplicitAny[]): void {
+  info(...args: unknown[]): void {
     this.report('info', args);
   }
 
-  debug(...args: ExplicitAny[]): void {
+  debug(...args: unknown[]): void {
     this.report('debug', args);
   }
 
-  warn(...args: ExplicitAny[]): void {
+  warn(...args: unknown[]): void {
     this.report('warn', args);
   }
 
-  error(...args: ExplicitAny[]): void {
+  error(...args: unknown[]): void {
     this.report('error', args);
   }
 
