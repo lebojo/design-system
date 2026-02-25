@@ -1,8 +1,7 @@
-import type { ExplicitAny } from '../../types/explicit-any.ts';
 import { areEquivalent } from './are-equivalent.ts';
 import type { EqualFunction } from './equal-function.ts';
 
-export function areMapEquivalent<GKey = ExplicitAny, GValue = ExplicitAny>(
+export function areMapEquivalent<GKey, GValue>(
   a: ReadonlyMap<GKey, GValue>,
   b: ReadonlyMap<GKey, GValue>,
   equal: EqualFunction<GKey | GValue> = areEquivalent,
