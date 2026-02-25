@@ -71,7 +71,7 @@ function colorToCompose(color: Color): string {
 }
 
 function kotlinColorPropertyToString(property: KotlinColorProperty): string {
-  return `    val ${property.name} = Color(${property.hexValue})`;
+  return indent(`val ${property.name} = Color(${property.hexValue})`, '    ');
 }
 
 function kotlinColorPropertiesToFileContent(properties: readonly KotlinColorProperty[]): string {
