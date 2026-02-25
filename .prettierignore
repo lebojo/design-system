@@ -1,4 +1,4 @@
-# Ignore artifacts:
+# Artifacts
 **/dist
 **/coverage
 **/storybook-static
@@ -12,3 +12,13 @@
 **/.svn
 **/.hg
 **/node_modules
+
+
+# JSON
+**/package.json
+**/tsconfig.json
+**/tsconfig.*.json
+
+# AUTO-GENERATED
+apps/docs/src/stories/assets/*.md
+packages/tokens/scripts/scripts/convert-figma-tokens/**/*.json

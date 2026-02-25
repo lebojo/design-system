@@ -1,5 +1,5 @@
 import type { Preview } from '@storybook/react-vite';
-import Table from '../src/components/Table';
+import Table from '../src/components/Table.tsx';
 
 const preview: Preview = {
   parameters: {

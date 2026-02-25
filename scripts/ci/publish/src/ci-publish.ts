@@ -1,5 +1,5 @@
-import { readdir } from 'node:fs/promises';
 import { Dirent } from 'node:fs';
+import { readdir } from 'node:fs/promises';
 import { join } from 'node:path';
 import process from 'node:process';
 import { readJsonFile } from '../../../helpers/file/read-json-file.ts';
@@ -27,10 +27,15 @@ export interface CiPublishOptions {
 
 export type IsNpmVersionPublished = (name: string, version: string) => Promise<boolean>;
 
-export type PublishWorkspacePackage = (workspaceName: string, tag: PublishContext['tag']) => Promise<void>;
+export type PublishWorkspacePackage = (
+  workspaceName: string,
+  tag: PublishContext['tag'],
+) => Promise<void>;
 
 export interface CiPublishDependencies {
-  readonly discoverPublishablePackages?: (rootDirectory: string) => Promise<readonly PublishablePackage[]>;
+  readonly discoverPublishablePackages?: (
+    rootDirectory: string,
+  ) => Promise<readonly PublishablePackage[]>;
   readonly isNpmVersionPublished?: IsNpmVersionPublished;
   readonly publishWorkspacePackage?: PublishWorkspacePackage;
 }

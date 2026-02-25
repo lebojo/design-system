@@ -236,8 +236,7 @@ function generateCategoryMarkdown(
  */
 export async function buildMarkdownTokens({
   baseCollection,
-  // @ts-expect-error: not in use yet
-  modifiers,
+  modifiers: _modifiers,
   outputDirectory,
   logger,
 }: BuildMarkdownTokensOptions) {

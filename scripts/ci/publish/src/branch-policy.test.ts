@@ -3,9 +3,9 @@ import { getPublishContext } from './branch-policy.ts';
 
 describe('getPublishContext', () => {
   it('maps develop to rc', () => {
-    expect(getPublishContext({ branchName: 'develop', version: '1.2.3-rc.4', strict: true })).toEqual(
-      { tag: 'rc' },
-    );
+    expect(
+      getPublishContext({ branchName: 'develop', version: '1.2.3-rc.4', strict: true }),
+    ).toEqual({ tag: 'rc' });
   });
 
   it('maps main to latest', () => {
