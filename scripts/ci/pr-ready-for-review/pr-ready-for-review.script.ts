@@ -11,18 +11,18 @@ import { dedent } from '../../helpers/misc/string/dedent/dedent.ts';
 
 const logger = Logger.root({ logLevel: DEFAULT_LOG_LEVEL });
 
-function onPullRequestScript(): Promise<void> {
-  return logger.asyncTask('on-pull-request.script', async (logger: Logger): Promise<void> => {
+function prReadyForReviewScript(): Promise<void> {
+  return logger.asyncTask('on-pull-request-ready.script', async (logger: Logger): Promise<void> => {
     loadOptionallyEnvFile(logger);
 
     const details: GithubPullRequestDetails = getEnvGithubPullRequestDetails();
 
-    await logger.asyncTask('send-kchat-notification', async (_logger: Logger): Promise<void> => {
+    await logger.asyncTask('send-kchat-notification', async (): Promise<void> => {
       await postKchatWebhookMessage({
         webhookId: getEnvKchatWebhookId(),
         text: dedent`
           #### 🚀 new pull request: ${details.title}
-          
+
           - 🔗 ${details.html_url}
           - 🧑 ${details.user.login}
         `,
@@ -32,7 +32,7 @@ function onPullRequestScript(): Promise<void> {
 }
 
 try {
-  await onPullRequestScript();
+  await prReadyForReviewScript();
 } catch (error: unknown) {
   logger.fatal(error);
 }
