@@ -1,5 +1,7 @@
+import { CSS_VARIABLE_PREFIX } from '../../../../../../../../scripts/build-tokens/src/constants/css-variable-prefix.ts';
 import { isCurlyReference } from '../../../../../../design-token/reference/types/curly/is-curly-reference.ts';
 import type { NumberDesignTokensCollectionToken } from '../../../../../token/types/base/number/number-design-tokens-collection-token.ts';
+import { createCssVariableNameGenerator } from '../../../../css/token/name/create-css-variable-name-generator.ts';
 import type { MarkdownRenderContext } from '../../markdown-render-context.ts';
 import type { MarkdownTokenRow } from '../../markdown-token-row.ts';
 
@@ -58,10 +60,16 @@ export function opacityDesignTokensCollectionTokenToMarkdown(
       `Opacity token "${token.name.join('.')}" references another token, which is not supported yet.`,
     );
 
+    // Generate the CSS variable name for this token
+    const cssVariable = createCssVariableNameGenerator({
+      prefix: CSS_VARIABLE_PREFIX,
+    })(token.name);
+
     return {
       preview: '',
       name: token.name.join('.'),
       value: opacity,
+      cssVariable,
       description: token.description ?? '',
     };
   }
@@ -140,10 +148,16 @@ export function opacityDesignTokensCollectionTokenToMarkdown(
     </div>
   `;
 
+  // Generate the CSS variable name for this token
+  const cssVariable = createCssVariableNameGenerator({
+    prefix: CSS_VARIABLE_PREFIX,
+  })(token.name);
+
   return {
     preview,
     name: token.name.join('.'),
     value: displayValue,
+    cssVariable,
     description: token.description ?? '',
   };
 }

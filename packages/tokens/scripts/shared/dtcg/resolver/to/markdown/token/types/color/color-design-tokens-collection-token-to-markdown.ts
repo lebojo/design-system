@@ -1,5 +1,7 @@
+import { CSS_VARIABLE_PREFIX } from '../../../../../../../../scripts/build-tokens/src/constants/css-variable-prefix.ts';
 import type { ColorDesignTokensCollectionToken } from '../../../../../token/types/base/color/color-design-tokens-collection-token.ts';
 import { valueOrCurlyReferenceToCssVariableReference } from '../../../../css/reference/value-or-curly-reference-to-css-variable-reference.ts';
+import { createCssVariableNameGenerator } from '../../../../css/token/name/create-css-variable-name-generator.ts';
 import { colorDesignTokensCollectionTokenValueToCssValue } from '../../../../css/token/types/base/color/value/color-design-tokens-collection-token-value-to-css-value.ts';
 import type { MarkdownRenderContext } from '../../markdown-render-context.ts';
 import type { MarkdownTokenRow } from '../../markdown-token-row.ts';
@@ -47,9 +49,15 @@ export function colorDesignTokensCollectionTokenToMarkdown(
 ): MarkdownTokenRow {
   // Get the color value as a CSS string (always returns the best representation)
   // For markdown, we use the default format which typically returns hex for srgb colors
+  // Uses the esds prefix to match the generated CSS output
   const cssValue: string = valueOrCurlyReferenceToCssVariableReference(
     token.value,
     colorDesignTokensCollectionTokenValueToCssValue,
+    {
+      generateCssVariableName: createCssVariableNameGenerator({
+        prefix: CSS_VARIABLE_PREFIX,
+      }),
+    },
   );
 
   // Create the color preview HTML
@@ -76,10 +84,16 @@ export function colorDesignTokensCollectionTokenToMarkdown(
     </div>
   `;
 
+  // Generate the CSS variable name for this token
+  const cssVariable = createCssVariableNameGenerator({
+    prefix: CSS_VARIABLE_PREFIX,
+  })(token.name);
+
   return {
     preview,
     name: token.name.join('.'),
     value: cssValue,
+    cssVariable,
     description: token.description ?? '',
   };
 }

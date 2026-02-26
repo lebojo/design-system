@@ -8,8 +8,10 @@
  * @module shadow-design-tokens-collection-token-to-markdown
  */
 
+import { CSS_VARIABLE_PREFIX } from '../../../../../../../../scripts/build-tokens/src/constants/css-variable-prefix.ts';
 import type { ShadowDesignTokensCollectionToken } from '../../../../../token/types/composite/shadow/shadow-design-tokens-collection-token.ts';
 import { valueOrCurlyReferenceToCssVariableReference } from '../../../../css/reference/value-or-curly-reference-to-css-variable-reference.ts';
+import { createCssVariableNameGenerator } from '../../../../css/token/name/create-css-variable-name-generator.ts';
 import { shadowDesignTokensCollectionTokenValueToCssValue } from '../../../../css/token/types/composite/shadow/value/shadow-design-tokens-collection-token-value-to-css-value.ts';
 import type { MarkdownRenderContext } from '../../markdown-render-context.ts';
 import type { MarkdownTokenRow } from '../../markdown-token-row.ts';
@@ -53,9 +55,15 @@ export function shadowDesignTokensCollectionTokenToMarkdown(
   const { boxSize = 50 } = options;
 
   // Construct the CSS box-shadow value using the shared helper
+  // Uses the esds prefix to match the generated CSS output
   const cssShadowValue = valueOrCurlyReferenceToCssVariableReference(
     token.value,
     shadowDesignTokensCollectionTokenValueToCssValue,
+    {
+      generateCssVariableName: createCssVariableNameGenerator({
+        prefix: CSS_VARIABLE_PREFIX,
+      }),
+    },
   );
 
   // Create the shadow preview HTML
@@ -85,10 +93,16 @@ export function shadowDesignTokensCollectionTokenToMarkdown(
     </div>
   `;
 
+  // Generate the CSS variable name for this token
+  const cssVariable = createCssVariableNameGenerator({
+    prefix: CSS_VARIABLE_PREFIX,
+  })(token.name);
+
   return {
     preview,
     name: token.name.join('.'),
     value: cssShadowValue,
+    cssVariable,
     description: token.description ?? '',
   };
 }

@@ -1,5 +1,7 @@
+import { CSS_VARIABLE_PREFIX } from '../../../../../../../../scripts/build-tokens/src/constants/css-variable-prefix.ts';
 import type { FontWeightDesignTokensCollectionToken } from '../../../../../token/types/base/font-weight/font-weight-design-tokens-collection-token.ts';
 import { valueOrCurlyReferenceToCssVariableReference } from '../../../../css/reference/value-or-curly-reference-to-css-variable-reference.ts';
+import { createCssVariableNameGenerator } from '../../../../css/token/name/create-css-variable-name-generator.ts';
 import { fontWeightDesignTokensCollectionTokenValueToCssValue } from '../../../../css/token/types/base/font-weight/value/font-weight-design-tokens-collection-token-value-to-css-value.ts';
 import type { MarkdownRenderContext } from '../../markdown-render-context.ts';
 import type { MarkdownTokenRow } from '../../markdown-token-row.ts';
@@ -60,9 +62,15 @@ export function fontWeightDesignTokensCollectionTokenToMarkdown(
   } = options;
 
   // Convert font weight to CSS value using shared helper
+  // Uses the esds prefix to match the generated CSS output
   const weightValue = valueOrCurlyReferenceToCssVariableReference(
     token.value,
     fontWeightDesignTokensCollectionTokenValueToCssValue,
+    {
+      generateCssVariableName: createCssVariableNameGenerator({
+        prefix: CSS_VARIABLE_PREFIX,
+      }),
+    },
   );
 
   // Create the font weight preview HTML
@@ -93,10 +101,16 @@ export function fontWeightDesignTokensCollectionTokenToMarkdown(
     </div>
   `;
 
+  // Generate the CSS variable name for this token
+  const cssVariable = createCssVariableNameGenerator({
+    prefix: CSS_VARIABLE_PREFIX,
+  })(token.name);
+
   return {
     preview,
     name: token.name.join('.'),
     value: weightValue,
+    cssVariable,
     description: token.description ?? '',
   };
 }

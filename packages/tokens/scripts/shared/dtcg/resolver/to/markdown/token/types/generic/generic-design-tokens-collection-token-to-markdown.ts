@@ -1,4 +1,6 @@
+import { CSS_VARIABLE_PREFIX } from '../../../../../../../../scripts/build-tokens/src/constants/css-variable-prefix.ts';
 import type { DesignTokensCollectionTokenWithType } from '../../../../../token/design-tokens-collection-token.ts';
+import { createCssVariableNameGenerator } from '../../../../css/token/name/create-css-variable-name-generator.ts';
 import type { MarkdownRenderContext } from '../../markdown-render-context.ts';
 import type { MarkdownTokenRow } from '../../markdown-token-row.ts';
 
@@ -173,10 +175,16 @@ export function genericDesignTokensCollectionTokenToMarkdown(
     preview = createFallbackPreview(token.type, displayValue, options);
   }
 
+  // Generate the CSS variable name for this token
+  const cssVariable = createCssVariableNameGenerator({
+    prefix: CSS_VARIABLE_PREFIX,
+  })(token.name);
+
   return {
     preview,
     name: token.name.join('.'),
     value: displayValue,
+    cssVariable,
     description: token.description ?? '',
   };
 }
