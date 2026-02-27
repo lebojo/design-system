@@ -10,6 +10,7 @@
 
 import { CSS_VARIABLE_PREFIX } from '../../../../../../../../scripts/build-tokens/src/constants/css-variable-prefix.ts';
 import { isCurlyReference } from '../../../../../../design-token/reference/types/curly/is-curly-reference.ts';
+import { curlyReferenceToString } from '../../../../../../design-token/reference/types/curly/to/string/curly-reference-to-string.ts';
 import type { ShadowDesignTokensCollectionToken } from '../../../../../token/types/composite/shadow/shadow-design-tokens-collection-token.ts';
 import { createCssVariableNameGenerator } from '../../../../css/token/name/create-css-variable-name-generator.ts';
 import { shadowDesignTokensCollectionTokenValueToCssValue } from '../../../../css/token/types/composite/shadow/value/shadow-design-tokens-collection-token-value-to-css-value.ts';
@@ -62,7 +63,7 @@ export function shadowDesignTokensCollectionTokenToMarkdown(
   // For T2/T3 (references): show the referenced token name
   let displayValue: string;
   if (isCurlyReference(token.value)) {
-    displayValue = String(token.value).replace(/[{}]/g, '');
+    displayValue = curlyReferenceToString(token.value);
   } else {
     displayValue = shadowDesignTokensCollectionTokenValueToCssValue(token.value);
   }

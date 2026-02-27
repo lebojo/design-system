@@ -1,5 +1,6 @@
 import { CSS_VARIABLE_PREFIX } from '../../../../../../../../scripts/build-tokens/src/constants/css-variable-prefix.ts';
 import { isCurlyReference } from '../../../../../../design-token/reference/types/curly/is-curly-reference.ts';
+import { curlyReferenceToString } from '../../../../../../design-token/reference/types/curly/to/string/curly-reference-to-string.ts';
 import type { NumberDesignTokensCollectionToken } from '../../../../../token/types/base/number/number-design-tokens-collection-token.ts';
 import { createCssVariableNameGenerator } from '../../../../css/token/name/create-css-variable-name-generator.ts';
 import type { MarkdownRenderContext } from '../../markdown-render-context.ts';
@@ -167,7 +168,7 @@ export function numberDesignTokensCollectionTokenToMarkdown(
   let displayValue: string;
 
   if (isCurlyReference(value)) {
-    displayValue = String(value).replace(/[{}]/g, '');
+    displayValue = curlyReferenceToString(value);
   } else if (Number.isInteger(value)) {
     // Integer value - show as-is
     displayValue = value.toString();

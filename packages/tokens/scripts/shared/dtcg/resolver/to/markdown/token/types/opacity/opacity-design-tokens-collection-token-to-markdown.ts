@@ -1,5 +1,6 @@
 import { CSS_VARIABLE_PREFIX } from '../../../../../../../../scripts/build-tokens/src/constants/css-variable-prefix.ts';
 import { isCurlyReference } from '../../../../../../design-token/reference/types/curly/is-curly-reference.ts';
+import { curlyReferenceToString } from '../../../../../../design-token/reference/types/curly/to/string/curly-reference-to-string.ts';
 import type { NumberDesignTokensCollectionToken } from '../../../../../token/types/base/number/number-design-tokens-collection-token.ts';
 import { createCssVariableNameGenerator } from '../../../../css/token/name/create-css-variable-name-generator.ts';
 import type { MarkdownRenderContext } from '../../markdown-render-context.ts';
@@ -64,7 +65,7 @@ export function opacityDesignTokensCollectionTokenToMarkdown(
   // For T2/T3 (references): show the referenced token name
   let displayValue: string;
   if (isCurlyReference(opacity)) {
-    displayValue = String(opacity).replace(/[{}]/g, '');
+    displayValue = curlyReferenceToString(opacity);
   } else {
     // Format the display value for direct values
     const percentage = Math.round(opacity * 100);

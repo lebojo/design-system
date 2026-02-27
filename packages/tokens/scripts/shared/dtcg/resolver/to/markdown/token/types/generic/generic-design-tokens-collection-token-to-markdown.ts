@@ -1,5 +1,7 @@
 import { CSS_VARIABLE_PREFIX } from '../../../../../../../../scripts/build-tokens/src/constants/css-variable-prefix.ts';
+import type { CurlyReference } from '../../../../../../design-token/reference/types/curly/curly-reference.ts';
 import { isCurlyReference } from '../../../../../../design-token/reference/types/curly/is-curly-reference.ts';
+import { curlyReferenceToString } from '../../../../../../design-token/reference/types/curly/to/string/curly-reference-to-string.ts';
 import type { DesignTokensCollectionTokenWithType } from '../../../../../token/design-tokens-collection-token.ts';
 import { createCssVariableNameGenerator } from '../../../../css/token/name/create-css-variable-name-generator.ts';
 import type { MarkdownRenderContext } from '../../markdown-render-context.ts';
@@ -166,8 +168,8 @@ export function genericDesignTokensCollectionTokenToMarkdown(
   // For T1 (direct values): format the raw value
   // For T2/T3 (references): show the referenced token name
   let displayValue: string;
-  if (isCurlyReference(token.value as unknown as string)) {
-    displayValue = String(token.value).replace(/[{}]/g, '');
+  if (isCurlyReference(token.value as unknown as CurlyReference)) {
+    displayValue = curlyReferenceToString(token.value as unknown as CurlyReference);
   } else {
     const formattedValue = formatValue(token.value, prettyPrintJson);
     displayValue = truncate(formattedValue, maxValueLength);

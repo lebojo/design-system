@@ -1,5 +1,6 @@
 import { CSS_VARIABLE_PREFIX } from '../../../../../../../../scripts/build-tokens/src/constants/css-variable-prefix.ts';
 import { isCurlyReference } from '../../../../../../design-token/reference/types/curly/is-curly-reference.ts';
+import { curlyReferenceToString } from '../../../../../../design-token/reference/types/curly/to/string/curly-reference-to-string.ts';
 import type { ColorDesignTokensCollectionToken } from '../../../../../token/types/base/color/color-design-tokens-collection-token.ts';
 import { createCssVariableNameGenerator } from '../../../../css/token/name/create-css-variable-name-generator.ts';
 import { colorDesignTokensCollectionTokenValueToCssValue } from '../../../../css/token/types/base/color/value/color-design-tokens-collection-token-value-to-css-value.ts';
@@ -57,7 +58,7 @@ export function colorDesignTokensCollectionTokenToMarkdown(
   // For T2/T3 (references): show the referenced token name (e.g., "color.red.500")
   let displayValue: string;
   if (isCurlyReference(token.value)) {
-    displayValue = String(token.value).replace(/[{}]/g, '');
+    displayValue = curlyReferenceToString(token.value);
   } else {
     // Token has a direct value - resolve it to show the actual color
     displayValue = colorDesignTokensCollectionTokenValueToCssValue(token.value);

@@ -1,5 +1,6 @@
 import { CSS_VARIABLE_PREFIX } from '../../../../../../../../scripts/build-tokens/src/constants/css-variable-prefix.ts';
 import { isCurlyReference } from '../../../../../../design-token/reference/types/curly/is-curly-reference.ts';
+import { curlyReferenceToString } from '../../../../../../design-token/reference/types/curly/to/string/curly-reference-to-string.ts';
 import type { DimensionDesignTokensCollectionToken } from '../../../../../token/types/base/dimension/dimension-design-tokens-collection-token.ts';
 import type { DimensionDesignTokensCollectionTokenValue } from '../../../../../token/types/base/dimension/value/dimension-design-tokens-collection-token-value.ts';
 import { createCssVariableNameGenerator } from '../../../../css/token/name/create-css-variable-name-generator.ts';
@@ -48,7 +49,7 @@ export function breakpointDesignTokensCollectionTokenToMarkdown(
   let displayValue: string;
   const value = token.value as DimensionDesignTokensCollectionTokenValue;
   if (isCurlyReference(token.value)) {
-    displayValue = String(token.value).replace(/[{}]/g, '');
+    displayValue = curlyReferenceToString(token.value);
   } else {
     displayValue = dimensionDesignTokensCollectionTokenValueToCssValue(value);
   }
