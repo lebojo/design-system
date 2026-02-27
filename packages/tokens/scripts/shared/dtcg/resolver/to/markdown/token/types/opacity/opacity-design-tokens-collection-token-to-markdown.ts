@@ -54,16 +54,16 @@ export function opacityDesignTokensCollectionTokenToMarkdown(
   // Get the opacity value
   const opacity = token.value;
 
+  // Generate the CSS variable name for this token
+  const cssVariable = createCssVariableNameGenerator({
+    prefix: CSS_VARIABLE_PREFIX,
+  })(token.name);
+
   if (isCurlyReference(opacity)) {
-    // TODO implement
+    // TODO implement proper CSS variable resolution for references
     console.warn(
       `Opacity token "${token.name.join('.')}" references another token, which is not supported yet.`,
     );
-
-    // Generate the CSS variable name for this token
-    const cssVariable = createCssVariableNameGenerator({
-      prefix: CSS_VARIABLE_PREFIX,
-    })(token.name);
 
     return {
       preview: '',
@@ -78,8 +78,8 @@ export function opacityDesignTokensCollectionTokenToMarkdown(
   const percentage = Math.round(opacity * 100);
   const displayValue = `${opacity} (${percentage}%)`;
 
-  // Create the opacity preview HTML
-  // Shows a checkerboard grid with a green overlay at the specified opacity
+  // Create the opacity preview HTML using CSS variable directly
+  // The browser resolves var(--esds-*) via the CSS cascade
   const preview = /* HTML */ `
     <div
       style="
@@ -116,7 +116,7 @@ export function opacityDesignTokensCollectionTokenToMarkdown(
         right: 0;
         bottom: 0;
         background-color: ${overlayColor};
-        opacity: ${opacity};
+        opacity: var(${cssVariable});
       "
       ></div>
       <div
@@ -147,11 +147,6 @@ export function opacityDesignTokensCollectionTokenToMarkdown(
       ${displayValue}
     </div>
   `;
-
-  // Generate the CSS variable name for this token
-  const cssVariable = createCssVariableNameGenerator({
-    prefix: CSS_VARIABLE_PREFIX,
-  })(token.name);
 
   return {
     preview,

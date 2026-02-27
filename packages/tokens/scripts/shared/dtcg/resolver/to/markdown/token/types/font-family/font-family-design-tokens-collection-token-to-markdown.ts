@@ -1,6 +1,6 @@
 import { CSS_VARIABLE_PREFIX } from '../../../../../../../../scripts/build-tokens/src/constants/css-variable-prefix.ts';
+import { isCurlyReference } from '../../../../../../design-token/reference/types/curly/is-curly-reference.ts';
 import type { FontFamilyDesignTokensCollectionToken } from '../../../../../token/types/base/font-family/font-family-design-tokens-collection-token.ts';
-import { valueOrCurlyReferenceToCssVariableReference } from '../../../../css/reference/value-or-curly-reference-to-css-variable-reference.ts';
 import { createCssVariableNameGenerator } from '../../../../css/token/name/create-css-variable-name-generator.ts';
 import { fontFamilyDesignTokensCollectionTokenValueToCssValue } from '../../../../css/token/types/base/font-family/value/font-family-design-tokens-collection-token-value-to-css-value.ts';
 import type { MarkdownRenderContext } from '../../markdown-render-context.ts';
@@ -51,25 +51,30 @@ export function fontFamilyDesignTokensCollectionTokenToMarkdown(
 ): MarkdownTokenRow {
   const { sampleText = DEFAULT_SAMPLE_TEXT, sampleFontSize = 16 } = options;
 
-  // Convert font family to CSS value using shared helper
-  // Uses the esds prefix to match the generated CSS output
-  // const value = token.value as FontFamilyDesignTokensCollectionTokenValue;
-  const fontFamilyString = valueOrCurlyReferenceToCssVariableReference(
-    token.value,
-    fontFamilyDesignTokensCollectionTokenValueToCssValue,
-    {
-      generateCssVariableName: createCssVariableNameGenerator({
-        prefix: CSS_VARIABLE_PREFIX,
-      }),
-    },
-  );
+  // Generate the CSS variable name for this token
+  const cssVariable = createCssVariableNameGenerator({
+    prefix: CSS_VARIABLE_PREFIX,
+  })(token.name);
+
+  // Get the display value
+  // For T1 (direct values): show the actual font family list
+  // For T2/T3 (references): show the CSS variable reference they point to
+  let displayValue: string;
+  if (isCurlyReference(token.value)) {
+    // Token references another token - show what it references
+    displayValue = `var(${cssVariable})`;
+  } else {
+    // Token has a direct value - resolve it to show the actual font family
+    displayValue = fontFamilyDesignTokensCollectionTokenValueToCssValue(token.value);
+  }
 
   // Create the font family preview HTML
-  // Shows sample text with the font family applied
+  // Shows sample text with the font family applied using CSS variable directly
+  // The browser resolves var(--esds-*) via the CSS cascade
   const preview = /* HTML */ `
     <p
       style="
-      font-family: ${fontFamilyString};
+      font-family: var(${cssVariable});
       font-size: ${sampleFontSize}px;
       margin: 0;
       padding: 8px;
@@ -88,19 +93,14 @@ export function fontFamilyDesignTokensCollectionTokenToMarkdown(
       color: #6b7280;
     "
     >
-      ${fontFamilyString}
+      ${displayValue}
     </div>
   `;
-
-  // Generate the CSS variable name for this token
-  const cssVariable = createCssVariableNameGenerator({
-    prefix: CSS_VARIABLE_PREFIX,
-  })(token.name);
 
   return {
     preview,
     name: token.name.join('.'),
-    value: fontFamilyString,
+    value: displayValue,
     cssVariable,
     description: token.description ?? '',
   };

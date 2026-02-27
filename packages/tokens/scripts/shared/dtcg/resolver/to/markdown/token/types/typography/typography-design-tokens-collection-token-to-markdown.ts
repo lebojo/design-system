@@ -135,13 +135,20 @@ export function typographyDesignTokensCollectionTokenToMarkdown(
     styleParts.push(`line-height: ${lineHeight}`);
   }
 
+  // Get the resolved CSS string for display
   const cssString = typographyDesignTokensCollectionTokenValueToCssValue(resolvedValue);
 
-  // Create the typography preview HTML
+  // Generate the CSS variable name for this token
+  const cssVariable = createCssVariableNameGenerator({
+    prefix: CSS_VARIABLE_PREFIX,
+  })(token.name);
+
+  // Create the typography preview HTML using CSS shorthand variable directly
+  // The browser resolves var(--esds-typography-*) via the CSS cascade
   const preview = /* HTML */ `
     <p
       style="
-      ${styleParts.join('; ')};
+      font: var(${cssVariable});
       margin: 0;
       padding: 12px;
       background: #f9fafb;
@@ -165,11 +172,6 @@ export function typographyDesignTokensCollectionTokenToMarkdown(
       ${cssString}
     </div>
   `;
-
-  // Generate the CSS variable name for this token
-  const cssVariable = createCssVariableNameGenerator({
-    prefix: CSS_VARIABLE_PREFIX,
-  })(token.name);
 
   return {
     preview,

@@ -1,6 +1,6 @@
 import { CSS_VARIABLE_PREFIX } from '../../../../../../../../scripts/build-tokens/src/constants/css-variable-prefix.ts';
+import { isCurlyReference } from '../../../../../../design-token/reference/types/curly/is-curly-reference.ts';
 import type { ColorDesignTokensCollectionToken } from '../../../../../token/types/base/color/color-design-tokens-collection-token.ts';
-import { valueOrCurlyReferenceToCssVariableReference } from '../../../../css/reference/value-or-curly-reference-to-css-variable-reference.ts';
 import { createCssVariableNameGenerator } from '../../../../css/token/name/create-css-variable-name-generator.ts';
 import { colorDesignTokensCollectionTokenValueToCssValue } from '../../../../css/token/types/base/color/value/color-design-tokens-collection-token-value-to-css-value.ts';
 import type { MarkdownRenderContext } from '../../markdown-render-context.ts';
@@ -47,28 +47,32 @@ export function colorDesignTokensCollectionTokenToMarkdown(
   _context: MarkdownRenderContext,
   _options: ColorMarkdownRenderOptions = {},
 ): MarkdownTokenRow {
-  // Get the color value as a CSS string (always returns the best representation)
-  // For markdown, we use the default format which typically returns hex for srgb colors
-  // Uses the esds prefix to match the generated CSS output
-  const cssValue: string = valueOrCurlyReferenceToCssVariableReference(
-    token.value,
-    colorDesignTokensCollectionTokenValueToCssValue,
-    {
-      generateCssVariableName: createCssVariableNameGenerator({
-        prefix: CSS_VARIABLE_PREFIX,
-      }),
-    },
-  );
+  // Generate the CSS variable name for this token
+  const cssVariable = createCssVariableNameGenerator({
+    prefix: CSS_VARIABLE_PREFIX,
+  })(token.name);
 
-  // Create the color preview HTML
-  // Shows a rounded rectangle with the color as background
+  // Get the display value
+  // For T1 (direct values): show the actual hex color
+  // For T2/T3 (references): show the CSS variable reference they point to
+  let displayValue: string;
+  if (isCurlyReference(token.value)) {
+    // Token references another token - show what it references
+    displayValue = `var(${cssVariable})`;
+  } else {
+    // Token has a direct value - resolve it to show the actual color
+    displayValue = colorDesignTokensCollectionTokenValueToCssValue(token.value);
+  }
+
+  // Create the color preview HTML using CSS variable directly
+  // The browser resolves var(--esds-*) via the CSS cascade
   const preview = /* HTML */ `
     <div
       style="
       border-radius: 4px;
       width: 100%;
       height: 75px;
-      background: ${cssValue};
+      background: var(${cssVariable});
       border: 1px solid #e5e7eb;
     "
     ></div>
@@ -80,19 +84,14 @@ export function colorDesignTokensCollectionTokenToMarkdown(
       color: #6b7280;
     "
     >
-      ${cssValue}
+      ${displayValue}
     </div>
   `;
-
-  // Generate the CSS variable name for this token
-  const cssVariable = createCssVariableNameGenerator({
-    prefix: CSS_VARIABLE_PREFIX,
-  })(token.name);
 
   return {
     preview,
     name: token.name.join('.'),
-    value: cssValue,
+    value: displayValue,
     cssVariable,
     description: token.description ?? '',
   };

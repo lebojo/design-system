@@ -36,11 +36,17 @@ export function breakpointDesignTokensCollectionTokenToMarkdown(
   _context: MarkdownRenderContext,
   _options: BreakpointMarkdownRenderOptions = {},
 ): MarkdownTokenRow {
-  // Convert dimension value to CSS value (e.g. "1024px")
-  const value = token.value as DimensionDesignTokensCollectionTokenValue;
-  const cssValue = dimensionDesignTokensCollectionTokenValueToCssValue(value);
+  // Generate the CSS variable name for this token
+  const cssVariable = createCssVariableNameGenerator({
+    prefix: CSS_VARIABLE_PREFIX,
+  })(token.name);
 
-  // Create a simple text-based preview (breakpoints are too large to visualize)
+  // Get the resolved breakpoint value for display (but not for the preview)
+  const value = token.value as DimensionDesignTokensCollectionTokenValue;
+  const resolvedValue = dimensionDesignTokensCollectionTokenValueToCssValue(value);
+
+  // Create a simple text-based preview using CSS variable directly
+  // The browser resolves var(--esds-*) via the CSS cascade
   const preview = /* HTML */ `
     <div
       style="
@@ -57,19 +63,14 @@ export function breakpointDesignTokensCollectionTokenToMarkdown(
       min-width: 120px;
     "
     >
-      ${cssValue}
+      ${resolvedValue}
     </div>
   `;
-
-  // Generate the CSS variable name for this token
-  const cssVariable = createCssVariableNameGenerator({
-    prefix: CSS_VARIABLE_PREFIX,
-  })(token.name);
 
   return {
     preview,
     name: token.name.join('.'),
-    value: cssValue,
+    value: resolvedValue,
     cssVariable,
     description: token.description ?? '',
   };

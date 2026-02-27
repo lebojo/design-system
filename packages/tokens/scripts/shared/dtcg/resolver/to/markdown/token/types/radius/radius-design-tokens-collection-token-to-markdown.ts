@@ -1,6 +1,6 @@
 import { CSS_VARIABLE_PREFIX } from '../../../../../../../../scripts/build-tokens/src/constants/css-variable-prefix.ts';
+import { isCurlyReference } from '../../../../../../design-token/reference/types/curly/is-curly-reference.ts';
 import type { DimensionDesignTokensCollectionToken } from '../../../../../token/types/base/dimension/dimension-design-tokens-collection-token.ts';
-import { valueOrCurlyReferenceToCssVariableReference } from '../../../../css/reference/value-or-curly-reference-to-css-variable-reference.ts';
 import { createCssVariableNameGenerator } from '../../../../css/token/name/create-css-variable-name-generator.ts';
 import { dimensionDesignTokensCollectionTokenValueToCssValue } from '../../../../css/token/types/base/dimension/value/dimension-design-tokens-collection-token-value-to-css-value.ts';
 import type { MarkdownRenderContext } from '../../markdown-render-context.ts';
@@ -42,22 +42,26 @@ export function radiusDesignTokensCollectionTokenToMarkdown(
   _context: MarkdownRenderContext,
   options: RadiusMarkdownRenderOptions = {},
 ): MarkdownTokenRow {
+  // Generate the CSS variable name for this token
+  const cssVariable = createCssVariableNameGenerator({
+    prefix: CSS_VARIABLE_PREFIX,
+  })(token.name);
+
+  // Get the display value
+  // For T1 (direct values): show the actual pixel value
+  // For T2/T3 (references): show the CSS variable reference they point to
+  let displayValue: string;
+  if (isCurlyReference(token.value)) {
+    // Token references another token - show what it references
+    displayValue = `var(${cssVariable})`;
+  } else {
+    // Token has a direct value - resolve it to show the actual value
+    displayValue = dimensionDesignTokensCollectionTokenValueToCssValue(token.value);
+  }
   const { boxSize = 100 } = options;
 
-  // Convert dimension value to CSS value (e.g. "8px")
-  // Uses the esds prefix to match the generated CSS output
-  const cssValue = valueOrCurlyReferenceToCssVariableReference(
-    token.value,
-    dimensionDesignTokensCollectionTokenValueToCssValue,
-    {
-      generateCssVariableName: createCssVariableNameGenerator({
-        prefix: CSS_VARIABLE_PREFIX,
-      }),
-    },
-  );
-
-  // Create the radius preview HTML
-  // Shows a square box with the border-radius applied
+  // Create the radius preview HTML using CSS variable directly
+  // The browser resolves var(--esds-*) via the CSS cascade
   const preview = /* HTML */ `
     <div
       style="
@@ -65,7 +69,7 @@ export function radiusDesignTokensCollectionTokenToMarkdown(
       height: ${boxSize}px;
       background: #dcfce8;
       border: 2px solid #374151;
-      border-radius: ${cssValue};
+      border-radius: var(${cssVariable});
       display: inline-block;
     "
     ></div>
@@ -77,19 +81,14 @@ export function radiusDesignTokensCollectionTokenToMarkdown(
       color: #6b7280;
     "
     >
-      ${cssValue}
+      ${displayValue}
     </div>
   `;
-
-  // Generate the CSS variable name for this token
-  const cssVariable = createCssVariableNameGenerator({
-    prefix: CSS_VARIABLE_PREFIX,
-  })(token.name);
 
   return {
     preview,
     name: token.name.join('.'),
-    value: cssValue,
+    value: displayValue,
     cssVariable,
     description: token.description ?? '',
   };
