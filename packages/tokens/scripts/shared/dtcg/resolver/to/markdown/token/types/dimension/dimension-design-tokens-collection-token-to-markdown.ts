@@ -49,11 +49,10 @@ export function dimensionDesignTokensCollectionTokenToMarkdown(
 
   // Get the display value
   // For T1 (direct values): show the actual pixel value
-  // For T2/T3 (references): show the CSS variable reference they point to
+  // For T2/T3 (references): show the referenced token name (e.g., "spacing.8")
   let displayValue: string;
   if (isCurlyReference(token.value)) {
-    // Token references another token - show what it references
-    displayValue = `var(${cssVariable})`;
+    displayValue = String(token.value).replace(/[{}]/g, '');
   } else {
     // Token has a direct value - resolve it to show the actual value
     displayValue = dimensionDesignTokensCollectionTokenValueToCssValue(token.value);

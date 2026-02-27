@@ -1,4 +1,5 @@
 import { CSS_VARIABLE_PREFIX } from '../../../../../../../../scripts/build-tokens/src/constants/css-variable-prefix.ts';
+import { isCurlyReference } from '../../../../../../design-token/reference/types/curly/is-curly-reference.ts';
 import type { DimensionDesignTokensCollectionToken } from '../../../../../token/types/base/dimension/dimension-design-tokens-collection-token.ts';
 import type { DimensionDesignTokensCollectionTokenValue } from '../../../../../token/types/base/dimension/value/dimension-design-tokens-collection-token-value.ts';
 import { createCssVariableNameGenerator } from '../../../../css/token/name/create-css-variable-name-generator.ts';
@@ -41,9 +42,16 @@ export function breakpointDesignTokensCollectionTokenToMarkdown(
     prefix: CSS_VARIABLE_PREFIX,
   })(token.name);
 
-  // Get the resolved breakpoint value for display (but not for the preview)
+  // Get the display value
+  // For T1 (direct values): show the actual breakpoint value
+  // For T2/T3 (references): show the referenced token name
+  let displayValue: string;
   const value = token.value as DimensionDesignTokensCollectionTokenValue;
-  const resolvedValue = dimensionDesignTokensCollectionTokenValueToCssValue(value);
+  if (isCurlyReference(token.value)) {
+    displayValue = String(token.value).replace(/[{}]/g, '');
+  } else {
+    displayValue = dimensionDesignTokensCollectionTokenValueToCssValue(value);
+  }
 
   // Create a simple text-based preview using CSS variable directly
   // The browser resolves var(--esds-*) via the CSS cascade
@@ -63,14 +71,14 @@ export function breakpointDesignTokensCollectionTokenToMarkdown(
       min-width: 120px;
     "
     >
-      ${resolvedValue}
+      ${displayValue}
     </div>
   `;
 
   return {
     preview,
     name: token.name.join('.'),
-    value: resolvedValue,
+    value: displayValue,
     cssVariable,
     description: token.description ?? '',
   };

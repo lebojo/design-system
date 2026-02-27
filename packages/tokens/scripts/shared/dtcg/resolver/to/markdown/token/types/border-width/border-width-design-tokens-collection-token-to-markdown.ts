@@ -53,8 +53,7 @@ export function borderWidthDesignTokensCollectionTokenToMarkdown(
   // For T2/T3 (references): show the CSS variable reference they point to
   let displayValue: string;
   if (isCurlyReference(token.value)) {
-    // Token references another token - show what it references
-    displayValue = `var(${cssVariable})`;
+    displayValue = String(token.value).replace(/[{}]/g, '');
   } else {
     // Token has a direct value - resolve it to show the actual value
     const value = token.value as DimensionDesignTokensCollectionTokenValue;
