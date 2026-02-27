@@ -127,10 +127,12 @@ Implemented solution:
 1. Produce a publishable artifact with a `package.json` in a target directory (e.g. `dist/web`, `dist/npm`)
 2. Create a `publish:ci` wrapper that calls the shared helper `publishNpmPackageDirectory(...)`
 3. Parse standard CI env vars:
+
 - `NPM_DIST_TAG`
 - `NPM_PUBLISH_VERSION`
 - `CI_PUBLISH_TIMESTAMP`
 - `NPM_INTERNAL_DEP_OVERRIDES_JSON`
+
 4. Add minimum unit tests for the wrapper (or at least for package-specific logic)
 5. Verify the package is discovered as “publishable” (presence of `scripts.publish:ci`)
 
@@ -140,10 +142,7 @@ Implemented solution:
 import process from 'node:process';
 import { join } from 'node:path';
 import { Logger } from '.../scripts/helpers/log/logger.ts';
-import {
-  parseJsonStringRecord,
-  parseNumber,
-} from '.../scripts/helpers/env/parse-value.ts';
+import { parseJsonStringRecord, parseNumber } from '.../scripts/helpers/env/parse-value.ts';
 import { publishNpmPackageDirectory } from '.../scripts/helpers/npm/publish-package-directory.ts';
 
 export async function publishMyPackage(): Promise<void> {
