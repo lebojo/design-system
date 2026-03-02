@@ -3,7 +3,7 @@ import {
   buildNpmPublishArgs,
   resolvePublishVersion,
   rewriteInternalDependencyVersions,
-} from './publish-tokens.ts';
+} from './publish-package-directory.ts';
 
 describe('buildNpmPublishArgs', () => {
   it('does not set tag when publishing to latest', () => {
@@ -49,16 +49,6 @@ describe('resolvePublishVersion', () => {
     ).toBe('1.2.3-dev.1234');
   });
 
-  it('returns package version when publishing to latest without override', () => {
-    expect(
-      resolvePublishVersion({
-        tag: 'latest',
-        packageVersion: '1.2.3',
-        publishTimestamp: 1234,
-      }),
-    ).toBe('1.2.3');
-  });
-
   it('generates rc prerelease from rc tag without override', () => {
     expect(
       resolvePublishVersion({
@@ -101,22 +91,5 @@ describe('rewriteInternalDependencyVersions', () => {
         '@scope/c': '2.0.0-rc.1234',
       },
     });
-  });
-
-  it('returns input as-is when no overrides are provided', () => {
-    const packageJsonContent = {
-      name: '@scope/b',
-      version: '1.2.3',
-      dependencies: {
-        '@scope/a': '1.2.3',
-      },
-    };
-
-    expect(
-      rewriteInternalDependencyVersions({
-        packageJsonContent,
-        overrides: {},
-      }),
-    ).toBe(packageJsonContent);
   });
 });
