@@ -1,6 +1,6 @@
 import { Dirent } from 'node:fs';
 import { readdir } from 'node:fs/promises';
-import { join, resolve } from 'node:path';
+import { join, normalize, resolve, sep } from 'node:path';
 import process from 'node:process';
 import { readJsonFile } from '../../../helpers/file/read-json-file.ts';
 import { type Logger } from '../../../helpers/log/logger.ts';
@@ -143,10 +143,6 @@ export async function discoverPublishablePackages(
   return publishablePackages;
 }
 
-function normalizePath(path: string): string {
-  return path.replaceAll('\\', '/').replace(/\/+$/, '');
-}
-
 function getImpactedPackageNames({
   packages,
   rootDirectory,
@@ -175,14 +171,14 @@ function getImpactedPackageNames({
   }
 
   for (const changedFile of changedFiles) {
-    const absoluteChangedFilePath: string = normalizePath(resolve(rootDirectory, changedFile));
+    const absoluteChangedFilePath: string = normalize(resolve(rootDirectory, changedFile));
 
     for (const pkg of packages) {
-      const packageDirectoryPath: string = normalizePath(resolve(pkg.directory));
+      const packageDirectoryPath: string = normalize(resolve(pkg.directory));
 
       if (
         absoluteChangedFilePath === packageDirectoryPath ||
-        absoluteChangedFilePath.startsWith(`${packageDirectoryPath}/`)
+        absoluteChangedFilePath.startsWith(`${packageDirectoryPath}${sep}`)
       ) {
         directImpactedNames.add(pkg.name);
       }
