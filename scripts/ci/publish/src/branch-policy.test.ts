@@ -4,7 +4,6 @@ import { getPublishContext } from './branch-policy.ts';
 describe('getPublishContext', () => {
   it('maps push on develop to rc publish context', () => {
     expect(getPublishContext({ eventName: 'push', branchName: 'develop' })).toEqual({
-      mode: 'rc',
       shouldPublish: true,
       tag: 'rc',
     });
@@ -12,7 +11,6 @@ describe('getPublishContext', () => {
 
   it('maps push on main to stable publish context', () => {
     expect(getPublishContext({ eventName: 'push', branchName: 'main' })).toEqual({
-      mode: 'stable',
       shouldPublish: true,
       tag: 'latest',
     });
@@ -26,7 +24,6 @@ describe('getPublishContext', () => {
         pullRequestLabels: ['bug', 'dev'],
       }),
     ).toEqual({
-      mode: 'dev',
       shouldPublish: true,
       tag: 'dev',
     });
@@ -40,7 +37,6 @@ describe('getPublishContext', () => {
         pullRequestLabels: ['ready-for-review'],
       }),
     ).toEqual({
-      mode: 'dev',
       shouldPublish: false,
       tag: 'dev',
     });

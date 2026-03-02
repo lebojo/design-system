@@ -206,12 +206,12 @@ function getImpactedPackageNames({
 
 function computePublishVersion({
   baseVersion,
-  mode,
+  tag,
   strict,
   publishTimestamp,
 }: {
   readonly baseVersion: string;
-  readonly mode: PublishContext['mode'];
+  readonly tag: PublishContext['tag'];
   readonly strict: boolean;
   readonly publishTimestamp: number;
 }): string {
@@ -225,11 +225,11 @@ function computePublishVersion({
     return baseVersion;
   }
 
-  if (mode === 'stable') {
+  if (tag === 'latest') {
     return baseVersion;
   }
 
-  return `${baseVersion}-${mode}.${publishTimestamp}`;
+  return `${baseVersion}-${tag}.${publishTimestamp}`;
 }
 
 async function listChangedFilesFromGit(
@@ -316,6 +316,7 @@ export async function ciPublish(
     branchName,
     pullRequestLabels,
   });
+  const { tag } = publishContext;
 
   if (!publishContext.shouldPublish) {
     logger.info(
@@ -335,7 +336,7 @@ export async function ciPublish(
   const decisions: CiPublishDecision[] = [];
   let candidatePackages: readonly PublishablePackage[] = packages;
 
-  if (publishContext.mode !== 'stable') {
+  if (tag !== 'latest') {
     if (
       gitBaseSha === undefined ||
       gitBaseSha === '' ||
@@ -373,7 +374,7 @@ export async function ciPublish(
       pkg.name,
       computePublishVersion({
         baseVersion: pkg.version,
-        mode: publishContext.mode,
+        tag,
         strict: strictVersionPolicy,
         publishTimestamp,
       }),
@@ -381,7 +382,7 @@ export async function ciPublish(
   );
 
   const internalDependencyVersionOverrides: Readonly<Record<string, string>> =
-    publishContext.mode === 'stable'
+    tag === 'latest'
       ? {}
       : Object.fromEntries(
           Array.from(publishVersionByPackageName.entries()).filter(
@@ -391,7 +392,6 @@ export async function ciPublish(
 
   for (const pkg of candidatePackages) {
     const publishVersion: string = publishVersionByPackageName.get(pkg.name)!;
-    const { tag }: PublishContext = publishContext;
     const isPublished: boolean = await isNpmVersionPublished(pkg.name, publishVersion);
 
     if (isPublished) {
