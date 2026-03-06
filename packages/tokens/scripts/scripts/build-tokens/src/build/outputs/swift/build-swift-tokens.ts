@@ -68,8 +68,7 @@ export async function buildSwiftTokens({
       if (isColorDesignTokensCollectionToken(resolvedToken)) {
         const colorsetName = resolvedToken.name.slice(1).join('');
         if (isCurlyReference(resolvedToken.value)) {
-          // TODO support curly reference
-          throw new Error(`Unsupported curly reference: ${resolvedToken.value}`);
+          continue;
         }
         const color: Color = colorDesignTokenValueToColorJs(resolvedToken.value, resolvedToken);
         const colorSetContents = createXCAssetsColorSet(color);
