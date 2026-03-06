@@ -5,9 +5,10 @@
   "main": "./index.js",
   "scripts": {
     "=== BUILD ===": "",
-    "build": "yarn build:tokens && yarn copy:dist && yarn copy:markdown",
+    "build": "yarn build:tokens && yarn build:sd && yarn copy:dist && yarn copy:markdown",
     "validate:tokens": "node --no-warnings=ExperimentalWarning scripts/scripts/validate-tokens/validate-tokens.script.ts",
     "build:tokens": "node --no-warnings=ExperimentalWarning scripts/scripts/build-tokens/build-tokens.script.ts",
+    "build:sd": "node --no-warnings=ExperimentalWarning sd-config/build.ts",
     "copy:dist": "DEST=demo/node_modules/@infomaniak-design-system/tokens/ && rm -rf $DEST && mkdir -p $DEST && cp -a dist/web/. $DEST",
     "copy:markdown": "cp -r dist/markdown/*.md ../../apps/docs/src/stories/assets/",
     "convert-figma-tokens": "node --no-warnings=ExperimentalWarning scripts/scripts/convert-figma-tokens/convert-figma-tokens.script.ts",
@@ -26,6 +27,7 @@
   "private": true,
   "devDependencies": {
     "colorjs.io": "^0.6.1",
+    "style-dictionary": "^5.3.3",
     "zod": "^4.3.6"
   }
 }

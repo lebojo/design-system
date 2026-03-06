@@ -95,7 +95,7 @@ export class Logger {
         logger.report(successLevel, [`DONE${extra}`]);
       } else {
         logger.report(errorLevel, [
-          `ERROR${extra}${Error.isError(result.error) ? `: ${result.error.message}` : ''}`,
+          `ERROR${extra}${result.error instanceof Error ? `: ${result.error.message}` : ''}`,
         ]);
         throw result.error;
       }
