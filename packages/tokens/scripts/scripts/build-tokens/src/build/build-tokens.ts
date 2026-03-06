@@ -57,12 +57,12 @@ export function buildTokens({
       logger,
     });
 
-    // SWIFT
-    // await buildSwiftTokens({
-    //   collection: baseCollection,
-    //   outputDirectory,
-    //   logger,
-    // });
+    SWIFT;
+    await buildSwiftTokens({
+      collection: baseCollection,
+      outputDirectory,
+      logger,
+    });
 
     // KOTLIN
     await buildKotlinTokens({
