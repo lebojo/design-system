@@ -66,16 +66,23 @@ function isTokenReference(token: TransformedToken): boolean {
 
 /**
  * Gets the Figma reference value for a token (with tier prefix).
+ * Uses the T2 name set to determine if the referenced token is T2 or T1.
  */
-function getFigmaReference(token: TransformedToken, tier: string): string {
+function getFigmaReference(token: TransformedToken, tier: string, t2Names: Set<string>): string {
   const original = String(token.original?.$value);
-  // Original is like {color.red.500} - need to add tier prefix -> {t1.color.red.500}
   const refPath = original.slice(1, -1); // remove { }
 
-  // Determine which tier the referenced token belongs to
-  // T2 tokens reference T1 tokens, T3 tokens reference T2 tokens
-  // For Figma, we always prefix the reference with the appropriate tier
-  return `{${tier === 't2' ? 't1' : tier === 't3' ? 't2' : 't1'}.${refPath}}`;
+  let targetTier: string;
+  if (tier === 't3') {
+    targetTier = 't2';
+  } else if (tier === 't2') {
+    // Check if the reference target is also a T2 token
+    targetTier = t2Names.has(refPath) ? 't2' : 't1';
+  } else {
+    targetTier = 't1';
+  }
+
+  return `{${targetTier}.${refPath}}`;
 }
 
 /**
@@ -169,11 +176,17 @@ export function buildFigmaTokens(
 ): string {
   const figmaTokens: Record<string, any> = {};
 
-  // Build set of T2 token names from base (where filePath is reliable)
+  // Build set of T2 token names and scopes map from base (where filePath is reliable)
   const baseT2Names = new Set<string>();
+  const baseScopesMap = new Map<string, string[]>();
   for (const token of baseTokens) {
+    const tokenName = token.path.join('.');
+    const scopes = (token.$extensions?.scopes ?? []) as string[];
+    if (scopes.length > 0) {
+      baseScopesMap.set(tokenName, scopes);
+    }
     if (getTier(token.filePath ?? '') === 't2') {
-      baseT2Names.add(token.path.join('.'));
+      baseT2Names.add(tokenName);
     }
   }
 
@@ -207,19 +220,19 @@ export function buildFigmaTokens(
       const isT2 = baseT2Names.has(tokenName) || getTier(token.filePath ?? '') === 't2';
       if (!isT2) continue;
 
-      const scopes = token.$extensions?.scopes ?? [];
+      const scopes = (token.$extensions?.scopes ?? baseScopesMap.get(tokenName) ?? []) as string[];
       const { $type, $value: figmaValue } = tokenToFigmaValue(token);
 
       // Use reference if the original value is a reference
       let finalValue: unknown = figmaValue;
       if (isTokenReference(token)) {
-        finalValue = getFigmaReference(token, 't2');
+        finalValue = getFigmaReference(token, 't2', baseT2Names);
       }
 
       const figmaToken: FigmaToken = {
         $type,
         $value: normalizeHexValue($type, finalValue),
-        scopes: scopes as string[],
+        scopes,
       };
 
       insertIntoTree(themeTree, ['t2', ...token.path], figmaToken);
