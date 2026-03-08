@@ -35,13 +35,29 @@ function getCssVariable(path: string[]): string {
   return `--${CSS_VARIABLE_PREFIX}-${segments}`;
 }
 
-function getDisplayValue(token: TransformedToken): string {
+function getDisplayValue(
+  token: TransformedToken,
+  valueMap?: Map<string, string>,
+): string {
+  const type = token.$type || token.type || '';
+
+  // Typography: resolve references to actual values
+  if (type === 'typography' && valueMap) {
+    return getTypographyDisplayValue(token, valueMap);
+  }
+
   const value = String(token.$value ?? token.value);
   // For references, show the original reference path (without curly braces)
   const original = token.original?.$value;
   if (typeof original === 'string' && original.startsWith('{') && original.endsWith('}')) {
     return original.slice(1, -1);
   }
+
+  // Font family: quote if it contains spaces
+  if (type === 'fontFamily') {
+    return quoteFontFamily(value);
+  }
+
   return value;
 }
 
@@ -198,8 +214,12 @@ function renderShadowPreview(token: TransformedToken, cssVariable: string): stri
   `;
 }
 
-function renderTypographyPreview(token: TransformedToken, cssVariable: string): string {
-  const displayValue = getDisplayValue(token);
+function renderTypographyPreview(
+  token: TransformedToken,
+  cssVariable: string,
+  valueMap?: Map<string, string>,
+): string {
+  const displayValue = getDisplayValue(token, valueMap);
   return /* HTML */ `
     <p
       style="
@@ -229,8 +249,12 @@ function renderTypographyPreview(token: TransformedToken, cssVariable: string): 
   `;
 }
 
-function renderFontFamilyPreview(token: TransformedToken, cssVariable: string): string {
-  const displayValue = getDisplayValue(token);
+function renderFontFamilyPreview(
+  token: TransformedToken,
+  cssVariable: string,
+  valueMap?: Map<string, string>,
+): string {
+  const displayValue = getDisplayValue(token, valueMap);
   return /* HTML */ `
     <p
       style="
@@ -494,13 +518,17 @@ function renderGenericPreview(token: TransformedToken, _cssVariable: string): st
   `;
 }
 
-function renderTokenPreview(token: TransformedToken, cssVariable: string): string {
+function renderTokenPreview(
+  token: TransformedToken,
+  cssVariable: string,
+  valueMap?: Map<string, string>,
+): string {
   const type = token.$type || token.type || '';
   const category = token.path[0] ?? '';
 
   if (type === 'color') return renderColorPreview(token, cssVariable);
-  if (type === 'typography') return renderTypographyPreview(token, cssVariable);
-  if (type === 'fontFamily') return renderFontFamilyPreview(token, cssVariable);
+  if (type === 'typography') return renderTypographyPreview(token, cssVariable, valueMap);
+  if (type === 'fontFamily') return renderFontFamilyPreview(token, cssVariable, valueMap);
   if (type === 'fontWeight') return renderFontWeightPreview(token, cssVariable);
   if (type === 'shadow') return renderShadowPreview(token, cssVariable);
 
@@ -525,11 +553,49 @@ interface TokenGroup {
   tokens: TransformedToken[];
 }
 
+function buildTokenValueMap(tokens: TransformedToken[]): Map<string, string> {
+  const map = new Map<string, string>();
+  for (const token of tokens) {
+    const refPath = token.path.join('.');
+    const value = String(token.$value ?? token.value);
+    map.set(refPath, value);
+  }
+  return map;
+}
+
+function quoteFontFamily(value: string): string {
+  return value.includes(' ') ? `"${value}"` : value;
+}
+
+function resolveRef(ref: string, valueMap: Map<string, string>): string {
+  if (typeof ref === 'string' && ref.startsWith('{') && ref.endsWith('}')) {
+    const path = ref.slice(1, -1);
+    return valueMap.get(path) ?? ref;
+  }
+  return String(ref);
+}
+
+function getTypographyDisplayValue(
+  token: TransformedToken,
+  valueMap: Map<string, string>,
+): string {
+  const original = token.original?.$value;
+  if (!original || typeof original !== 'object') return String(token.$value ?? token.value);
+
+  const fontWeight = resolveRef(original.fontWeight, valueMap);
+  const fontSize = resolveRef(original.fontSize, valueMap);
+  const lineHeight = resolveRef(original.lineHeight, valueMap);
+  const fontFamily = quoteFontFamily(resolveRef(original.fontFamily, valueMap));
+
+  return `${fontWeight} ${fontSize}/${lineHeight} ${fontFamily}`;
+}
+
 /**
  * Markdown format - groups tokens by tier+category and generates markdown tables.
  * Returns a Map of filename -> content (used by the build orchestrator).
  */
 export function generateMarkdownFiles(tokens: TransformedToken[]): Map<string, string> {
+  const valueMap = buildTokenValueMap(tokens);
   const groups = new Map<string, TokenGroup>();
 
   for (const token of tokens) {
@@ -559,7 +625,7 @@ export function generateMarkdownFiles(tokens: TransformedToken[]): Map<string, s
 
     for (const token of group.tokens) {
       const cssVariable = getCssVariable(token.path);
-      const preview = normalizeHtml(renderTokenPreview(token, cssVariable));
+      const preview = normalizeHtml(renderTokenPreview(token, cssVariable, valueMap));
       const name = token.path.join('.');
       const description = token.$description || token.description || '';
 
